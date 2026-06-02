@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>WILDCARD — Ice-Breaker Slot Machine</title>
+<meta name="description" content="Spin for a random celebrity-interview ice-breaker, guess the answer, then reveal what the guest actually said." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="css/wildcard.css" />
+</head>
+<body>
+<div class="app housing-Console">
+  <div class="backdrop" aria-hidden="true"></div>
+
+  <!-- Settings (real app settings; replaces the prototype Tweaks panel) -->
+  <div class="settings" id="settings">
+    <button class="settings-toggle" id="settingsToggle" aria-label="Settings" aria-expanded="false" aria-controls="settingsPanel">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="3"></circle>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+      </svg>
+    </button>
+    <div class="settings-panel" id="settingsPanel" role="dialog" aria-label="Settings" hidden></div>
+  </div>
+
+  <main class="stage">
+    <div class="reel-frame">
+      <div class="reel-window" id="reelWindow">
+        <!-- idle-card or reel-strip injected here by js/app.js -->
+        <div class="reel-mask top"></div>
+        <div class="reel-mask bottom"></div>
+        <div class="reel-line top"></div>
+        <div class="reel-line bottom"></div>
+        <div class="spark-host" id="sparkHost"></div>
+      </div>
+    </div>
+
+    <div class="controls" id="controls">
+      <!-- reveal/back button injected conditionally -->
+      <button class="btn pull invite" id="pull">
+        <span class="pull-face">Spin</span>
+      </button>
+    </div>
+  </main>
+</div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
