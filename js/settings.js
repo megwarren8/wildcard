@@ -1,15 +1,19 @@
 /* ------------------------------------------------------------------
- *  Settings — the four real, user-facing settings recommended by the
- *  handoff (Question pool, Answer mode, Spin time, Confetti). Cosmetic
- *  options (theme/font/housing/idle mark) are fixed to their chosen
- *  defaults (Carnival / Bricolage / Console / Question mark) and are
- *  not exposed here. Persisted to localStorage.
+ *  Settings — the real, user-facing settings recommended by the
+ *  handoff. Vibe is chosen via the always-visible vibe bar (app.js);
+ *  this popover exposes Source, Answer mode, Spin time, and Confetti.
+ *  Cosmetic options (theme/font/housing/idle mark) are fixed to their
+ *  chosen defaults (Carnival / Bricolage / Console / Question mark) and
+ *  are not exposed here. Persisted to localStorage.
  * ------------------------------------------------------------------ */
+
+import { SOURCES } from './data.js';
 
 const KEY = 'wildcard.settings';
 
 export const DEFAULTS = {
-  source: 'Everything',      // 'Everything' | 'On Purpose' | 'Hot Ones'
+  vibe: 'Everything',        // 'Everything' | one of VIBES (set via the vibe bar)
+  source: 'Everything',      // 'Everything' | one of SOURCES
   revealMode: 'Guess first', // 'Guess first' | 'Show answer'
   spinSpeed: 2.6,            // seconds, 1.2–4
   confetti: true,
@@ -24,7 +28,8 @@ export function loadSettings() {
   }
 }
 
-function save(settings) {
+/** Persist settings to localStorage (also used by the vibe bar in app.js). */
+export function saveSettings(settings) {
   try { localStorage.setItem(KEY, JSON.stringify(settings)); } catch { /* ignore */ }
 }
 
@@ -33,15 +38,17 @@ function save(settings) {
  * @param {object} opts
  * @param {object} opts.settings   current settings (mutated in place + persisted)
  * @param {(changed: string) => void} opts.onChange  called with the changed key
+ * @param {string[]} [opts.sources]  source options to show (defaults to all SOURCES);
+ *   pass only the sources present in the data so empty ones aren't offered.
  */
-export function initSettings({ settings, onChange }) {
+export function initSettings({ settings, onChange, sources = SOURCES }) {
   const root = document.getElementById('settings');
   const toggle = document.getElementById('settingsToggle');
   const panel = document.getElementById('settingsPanel');
 
   const apply = (key, value) => {
     settings[key] = value;
-    save(settings);
+    saveSettings(settings);
     onChange(key);
   };
 
@@ -50,7 +57,7 @@ export function initSettings({ settings, onChange }) {
   panel.appendChild(heading('Settings'));
 
   const segRows = [];
-  segRows.push(segRow('Question pool', 'source', ['Everything', 'On Purpose', 'Hot Ones']));
+  segRows.push(segRow('Source', 'source', [['All', 'Everything'], ...sources]));
   segRows.push(segRow('Answer', 'revealMode', ['Guess first', 'Show answer']));
   segRows.forEach((r) => panel.appendChild(r.row));
 
@@ -124,7 +131,7 @@ export function initSettings({ settings, onChange }) {
   function footer() {
     const f = document.createElement('div');
     f.className = 'set-foot';
-    f.textContent = 'Space / Enter to spin · R to reveal';
+    f.textContent = 'Space spin · R reveal · Esc home';
     return f;
   }
 

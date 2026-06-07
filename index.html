@@ -23,6 +23,12 @@
 <div class="app housing-Console">
   <div class="backdrop" aria-hidden="true"></div>
 
+  <!-- Home: reset to the idle start screen (also bound to Esc). Hidden while idle. -->
+  <button class="home-btn hidden" id="homeBtn" aria-label="Back to start" title="Back to start (Esc)">
+    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 3 3 10.2V21h6v-6h6v6h6V10.2z"></path></svg>
+    <span>Home</span>
+  </button>
+
   <!-- Settings (real app settings; replaces the prototype Tweaks panel) -->
   <div class="settings" id="settings">
     <button class="settings-toggle" id="settingsToggle" aria-label="Settings" aria-expanded="false" aria-controls="settingsPanel">
@@ -35,6 +41,9 @@
   </div>
 
   <main class="stage">
+    <!-- Vibe picker: always-visible category chooser (populated by js/app.js) -->
+    <div class="vibe-bar" id="vibeBar" role="group" aria-label="Pick a category"></div>
+
     <div class="reel-frame">
       <div class="reel-window" id="reelWindow">
         <!-- idle-card or reel-strip injected here by js/app.js -->

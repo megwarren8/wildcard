@@ -3,7 +3,7 @@
  *  (Vanilla equivalent of the prototype's <Card> and <IdleMark>.)
  * ------------------------------------------------------------------ */
 
-import { accentFor, tagFor } from './data.js';
+import { vibeAccent } from './data.js';
 import { TARGET_IDX } from './reel.js';
 
 const el = (tag, cls, text) => {
@@ -16,25 +16,27 @@ const el = (tag, cls, text) => {
 /** One reel cell: cream card with a question front layer + answer back layer. */
 export function buildCard(row, { active = false } = {}) {
   const wrap = el('div', 'card-wrap' + (active ? ' active' : ''));
-  const accent = accentFor(row.source); // 'a1' (Hot Ones) | 'a3' (On Purpose)
+  const accent = vibeAccent(row.vibe); // festive colour, vibe-coded
 
   const card = el('div', 'card');
-  card.style.setProperty('--accent', `var(--${accent})`);
+  card.style.setProperty('--accent', accent);
 
-  // Front — the question.
+  // Front — vibe chip eyebrow + the question.
   const q = el('div', 'layer q');
-  q.appendChild(el('span', 'q-mark', '?'));
+  const eyebrow = el('div', 'q-eyebrow');
+  eyebrow.appendChild(el('span', 'vibe-chip', row.vibe));
+  q.appendChild(eyebrow);
   const long = (row.q || '').length > 95;
   q.appendChild(el('p', 'q-text' + (long ? ' sm' : ''), row.q));
 
-  // Back — the answer + attribution.
+  // Back — the answer + attribution (source pill on the card's vibe accent).
   const a = el('div', 'layer a');
   a.appendChild(el('span', 'a-label', 'They said'));
   a.appendChild(el('p', 'a-text', row.a));
   const attrib = el('div', 'attrib');
   attrib.appendChild(el('span', 'who', row.guest));
-  const src = el('span', 'src', tagFor(row.source));
-  src.style.background = `var(--${accent})`;
+  const src = el('span', 'src', row.source);
+  src.style.background = accent;
   attrib.appendChild(src);
   a.appendChild(attrib);
 
