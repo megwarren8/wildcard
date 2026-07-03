@@ -195,6 +195,7 @@ body{
    A subtle gear in the top-right opens a compact popover.
    ================================================================== */
 .settings{position:fixed;top:18px;right:18px;z-index:20}
+.copyright{position:fixed;bottom:14px;right:18px;z-index:5;font-size:10px;color:var(--dim);opacity:.55;pointer-events:none;letter-spacing:.02em;font-family:var(--font);}
 .settings-toggle{width:44px;height:44px;border-radius:50%;cursor:pointer;display:grid;place-items:center;
   color:var(--ink);background:color-mix(in oklab,var(--ink) 8%,transparent);
   border:1px solid color-mix(in oklab,var(--ink) 16%,transparent);
