@@ -46,12 +46,13 @@ export async function loadQuestions() {
 }
 
 /**
- * Filter the bank by the two independent dimensions, applied together (AND):
- * vibe ('Everything' + the 10 vibes) and source ('Everything' + the 6 sources).
- * Some vibe×source combos have few or zero cards - callers guard the empty pool.
+ * Filter the bank by the two independent dimensions, applied together (AND).
+ * Both `vibes` and `sources` are ARRAYS (multiselect); an empty array on a
+ * dimension means "no filter" (i.e. All) on that dimension. Callers guard the
+ * empty pool.
  */
-export function poolFor(all, { vibe = 'Everything', source = 'Everything' } = {}) {
+export function poolFor(all, { vibes = [], sources = [] } = {}) {
   return all.filter((r) =>
-    (vibe === 'Everything' || r.vibe === vibe) &&
-    (source === 'Everything' || r.source === source));
+    (vibes.length === 0 || vibes.includes(r.vibe)) &&
+    (sources.length === 0 || sources.includes(r.source)));
 }

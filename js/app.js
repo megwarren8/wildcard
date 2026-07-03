@@ -1,9 +1,13 @@
 /* ==================================================================
- *  WILDCARD - main controller.
+ *  WILDCARD, main controller.
  *
  *  State machine:  idle → spinning → landed → revealed  (and back to
  *  landed, or a new spinning). All state is local; the active strip
  *  cell is the source of truth for the landed card.
+ *
+ *  Filters: both vibes and sources are ARRAYS (multi-select). An empty
+ *  array on a dimension means "no filter" (i.e. All) on that dimension.
+ *  Home button + Esc reset both filters back to All.
  * ================================================================== */
 
 import { loadQuestions, poolFor, VIBES, SOURCES, vibeAccent } from './data.js';
@@ -30,6 +34,7 @@ let contentEl = null;          // idle-card or reel-strip currently in the windo
 let cancelSpin = null;         // teardown for the running spin
 let autoRevealTimer = 0;
 let drawn = 0;
+let settingsHandles = null;    // { refreshSourceSeg } returned from initSettings
 
 const settings = loadSettings();
 
@@ -43,6 +48,10 @@ function mountContent(node) {
 function setPhase(p) {
   phase = p;
   render();
+}
+
+function recomputePool() {
+  pool = poolFor(all, { vibes: settings.vibes, sources: settings.sources });
 }
 
 /* --- spin / reveal ------------------------------------------------- */
@@ -80,17 +89,30 @@ function toggleAnswer() {
   else if (phase === 'landed') setPhase('revealed');
 }
 
-/* Reset to the idle home screen (Home button + Esc). */
+/* Reset to the idle home screen (Home button + Esc). Also clears the
+ * vibe and source filters, so "Home" is a true fresh start. */
 function goHome() {
   clearTimeout(autoRevealTimer);
   if (cancelSpin) { cancelSpin(); cancelSpin = null; }
   stripEl = null;
+
+  const hadFilters = (settings.vibes && settings.vibes.length) || (settings.sources && settings.sources.length);
+  settings.vibes = [];
+  settings.sources = [];
+  if (hadFilters) {
+    saveSettings(settings);
+    recomputePool();
+    refreshVibeBar();
+    if (settingsHandles && settingsHandles.refreshSourceSeg) settingsHandles.refreshSourceSeg();
+  }
   setPhase('idle');
 }
 
 /* --- vibe picker (always-visible category chooser) ----------------- */
-/* `vibes` is the set actually present in the loaded data (canonical order),
- * so empty categories never show as dead-end chips. */
+/* Multi-select. Clicking "All vibes" clears the whole selection (so all
+ * vibes are in play). Clicking a specific vibe toggles it in and out of
+ * the settings.vibes array. When settings.vibes is empty, "All vibes"
+ * appears active and every specific vibe reads as inactive. */
 function buildVibeBar(vibes = VIBES) {
   vibeBar.innerHTML = '';
   ['Everything', ...vibes].forEach((name) => {
@@ -101,25 +123,33 @@ function buildVibeBar(vibes = VIBES) {
     // 'All vibes' uses yellow (--a2); each vibe uses its festive accent.
     b.style.setProperty('--chip', name === 'Everything' ? 'var(--a2)' : vibeAccent(name));
     b.dataset.vibe = name;
-    b.addEventListener('click', () => { b.blur(); selectVibe(name); });
+    b.addEventListener('click', () => { b.blur(); onVibeClick(name); });
     vibeBar.appendChild(b);
   });
   refreshVibeBar();
 }
 
 function refreshVibeBar() {
+  const active = settings.vibes || [];
+  const allActive = active.length === 0;
   vibeBar.querySelectorAll('.vchip').forEach((b) => {
-    const on = (settings.vibe || 'Everything') === b.dataset.vibe;
+    const vibe = b.dataset.vibe;
+    const on = vibe === 'Everything' ? allActive : active.includes(vibe);
     b.classList.toggle('on', on);
     b.setAttribute('aria-pressed', String(on));
   });
 }
 
-function selectVibe(name) {
-  if (settings.vibe === name) return;
-  settings.vibe = name;
+function onVibeClick(name) {
+  const current = Array.isArray(settings.vibes) ? settings.vibes : [];
+  if (name === 'Everything') {
+    if (current.length === 0) return;   // already at "All"
+    settings.vibes = [];
+  } else {
+    settings.vibes = current.includes(name) ? current.filter((v) => v !== name) : [...current, name];
+  }
   saveSettings(settings);
-  pool = poolFor(all, { vibe: settings.vibe, source: settings.source });
+  recomputePool();
   refreshVibeBar();
   if (phase === 'idle') render(); // refresh the "{N} prompts loaded" count
 }
@@ -190,8 +220,8 @@ function onKey(e) {
 
 /* --- settings changes ---------------------------------------------- */
 function onSettingChange(key) {
-  if (key === 'source') {
-    pool = poolFor(all, { vibe: settings.vibe, source: settings.source });
+  if (key === 'sources') {
+    recomputePool();
     if (phase === 'idle') render(); // refresh the prompt count
   } else if (key === 'revealMode') {
     render();          // show/hide the reveal button
@@ -228,23 +258,26 @@ async function boot() {
     all = await loadQuestions();
 
     // Only surface categories that actually have cards (canonical order),
-    // so a category with zero cards (e.g. an empty vibe) is never offered.
+    // so a category with zero cards is never offered.
     const presentVibes = VIBES.filter((v) => all.some((r) => r.vibe === v));
     const presentSources = SOURCES.filter((s) => all.some((r) => r.source === s));
 
     // Drop any persisted filter that no longer exists in the current data.
-    let dirty = false;
-    if (settings.vibe !== 'Everything' && !presentVibes.includes(settings.vibe)) { settings.vibe = 'Everything'; dirty = true; }
-    if (settings.source !== 'Everything' && !presentSources.includes(settings.source)) { settings.source = 'Everything'; dirty = true; }
-    if (dirty) saveSettings(settings);
+    const cleanVibes = (settings.vibes || []).filter((v) => presentVibes.includes(v));
+    const cleanSources = (settings.sources || []).filter((s) => presentSources.includes(s));
+    if (cleanVibes.length !== (settings.vibes || []).length || cleanSources.length !== (settings.sources || []).length) {
+      settings.vibes = cleanVibes;
+      settings.sources = cleanSources;
+      saveSettings(settings);
+    }
 
-    initSettings({ settings, onChange: onSettingChange, sources: presentSources });
+    settingsHandles = initSettings({ settings, onChange: onSettingChange, sources: presentSources });
     buildVibeBar(presentVibes);
 
-    pool = poolFor(all, { vibe: settings.vibe, source: settings.source });
+    recomputePool();
     render();
   } catch (err) {
-    initSettings({ settings, onChange: onSettingChange }); // still wire the gear
+    settingsHandles = initSettings({ settings, onChange: onSettingChange }); // still wire the gear
     showLoadError(err);
   }
 }

@@ -1,5 +1,5 @@
 /* ------------------------------------------------------------------
- *  Settings - the real, user-facing settings recommended by the
+ *  Settings, the real, user-facing settings recommended by the
  *  handoff. Vibe is chosen via the always-visible vibe bar (app.js);
  *  this popover exposes Source, Answer mode, Spin time, and Confetti.
  *  Cosmetic options (theme/font/housing/idle mark) are fixed to their
@@ -12,8 +12,8 @@ import { SOURCES } from './data.js';
 const KEY = 'wildcard.settings';
 
 export const DEFAULTS = {
-  vibe: 'Everything',        // 'Everything' | one of VIBES (set via the vibe bar)
-  source: 'Everything',      // 'Everything' | one of SOURCES
+  vibes: [],                 // array of VIBES; empty = All (multiselect via vibe bar)
+  sources: [],               // array of SOURCES; empty = All (multiselect via settings panel)
   revealMode: 'Guess first', // 'Guess first' | 'Show answer'
   spinSpeed: 2.6,            // seconds, 1.2-4
   confetti: true,
@@ -22,7 +22,19 @@ export const DEFAULTS = {
 export function loadSettings() {
   try {
     const saved = JSON.parse(localStorage.getItem(KEY) || '{}');
-    return { ...DEFAULTS, ...saved };
+    // Legacy migration MUST run against the RAW saved payload (before merging
+    // with DEFAULTS), because DEFAULTS.vibes = [] would mask the missing key.
+    // If the raw payload has an old string 'vibe'/'source' but no new array
+    // 'vibes'/'sources', carry the legacy selection over.
+    if (!Array.isArray(saved.vibes) && typeof saved.vibe === 'string') {
+      saved.vibes = (saved.vibe && saved.vibe !== 'Everything') ? [saved.vibe] : [];
+    }
+    if (!Array.isArray(saved.sources) && typeof saved.source === 'string') {
+      saved.sources = (saved.source && saved.source !== 'Everything') ? [saved.source] : [];
+    }
+    const s = { ...DEFAULTS, ...saved };
+    delete s.vibe; delete s.source;
+    return s;
   } catch {
     return { ...DEFAULTS };
   }
@@ -40,6 +52,8 @@ export function saveSettings(settings) {
  * @param {(changed: string) => void} opts.onChange  called with the changed key
  * @param {string[]} [opts.sources]  source options to show (defaults to all SOURCES);
  *   pass only the sources present in the data so empty ones aren't offered.
+ * @returns {{ refreshSourceSeg: () => void }}  handles for app.js to refresh the UI
+ *   after external state changes (Home button resets filters, etc.).
  */
 export function initSettings({ settings, onChange, sources = SOURCES }) {
   const root = document.getElementById('settings');
@@ -56,20 +70,33 @@ export function initSettings({ settings, onChange, sources = SOURCES }) {
   panel.innerHTML = '';
   panel.appendChild(heading('Settings'));
 
-  const segRows = [];
-  segRows.push(segRow('Source', 'source', [['All', 'Everything'], ...sources]));
-  segRows.push(segRow('Answer', 'revealMode', ['Guess first', 'Show answer']));
-  segRows.forEach((r) => panel.appendChild(r.row));
+  // Source: multi-select. Click a source to toggle it; click All to clear
+  // the whole selection (all sources are then in play).
+  const sourceRow = multiSelectRow('Source', 'sources', sources);
+  panel.appendChild(sourceRow.row);
+
+  const answerRow = segRow('Answer', 'revealMode', ['Guess first', 'Show answer']);
+  panel.appendChild(answerRow.row);
 
   panel.appendChild(rangeRow('Spin time', 'spinSpeed', 1.2, 4, 0.1));
   panel.appendChild(segRow('Confetti', 'confetti', [['On', true], ['Off', false]]).row);
   panel.appendChild(footer());
 
-  // refresh pressed-states for a segmented row
+  // refresh pressed-states for a single-select segmented row
   function refreshSeg(row, key) {
     row.querySelectorAll('button[data-val]').forEach((b) => {
       const val = parseVal(b.dataset.val);
       b.setAttribute('aria-pressed', String(val === settings[key]));
+    });
+  }
+
+  // refresh pressed-states for a multi-select array row
+  function refreshMulti(seg, key, allBtn) {
+    const active = settings[key] || [];
+    const allActive = active.length === 0;
+    if (allBtn) allBtn.setAttribute('aria-pressed', String(allActive));
+    seg.querySelectorAll('button[data-mval]').forEach((b) => {
+      b.setAttribute('aria-pressed', String(active.includes(b.dataset.mval)));
     });
   }
 
@@ -103,6 +130,49 @@ export function initSettings({ settings, onChange, sources = SOURCES }) {
     row.appendChild(seg);
     queueMicrotask(() => refreshSeg(seg, key));
     return { row, seg };
+  }
+
+  /* Multi-select segmented row. `values` is an array of string options.
+   * Renders an "All" button that clears the selection, plus one button per
+   * option that toggles that option in the settings[key] array. */
+  function multiSelectRow(label, key, values) {
+    const row = document.createElement('div');
+    row.className = 'set-row';
+    const lab = document.createElement('label');
+    lab.textContent = label;
+    row.appendChild(lab);
+
+    const seg = document.createElement('div');
+    seg.className = 'seg';
+
+    const allBtn = document.createElement('button');
+    allBtn.type = 'button';
+    allBtn.textContent = 'All';
+    allBtn.dataset.mall = '1';
+    allBtn.addEventListener('click', () => {
+      apply(key, []);
+      refreshMulti(seg, key, allBtn);
+    });
+    seg.appendChild(allBtn);
+
+    values.forEach((v) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = v;
+      b.dataset.mval = v;
+      b.addEventListener('click', () => {
+        const current = Array.isArray(settings[key]) ? settings[key] : [];
+        const has = current.includes(v);
+        const next = has ? current.filter((x) => x !== v) : [...current, v];
+        apply(key, next);
+        refreshMulti(seg, key, allBtn);
+      });
+      seg.appendChild(b);
+    });
+
+    row.appendChild(seg);
+    queueMicrotask(() => refreshMulti(seg, key, allBtn));
+    return { row, seg, refresh: () => refreshMulti(seg, key, allBtn) };
   }
 
   function rangeRow(label, key, min, max, step) {
@@ -156,9 +226,11 @@ export function initSettings({ settings, onChange, sources = SOURCES }) {
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && !panel.hidden) close();
   });
+
+  return { refreshSourceSeg: sourceRow.refresh };
 }
 
-// segmented buttons may carry non-string values (booleans) - round-trip safely.
+// segmented buttons may carry non-string values (booleans), round-trip safely.
 function encodeVal(v) { return typeof v === 'boolean' ? `b:${v}` : `s:${v}`; }
 function parseVal(s) {
   if (s.startsWith('b:')) return s === 'b:true';
