@@ -21,7 +21,7 @@ export function buildCard(row, { active = false } = {}) {
   const card = el('div', 'card');
   card.style.setProperty('--accent', accent);
 
-  // Front — vibe chip eyebrow + the question.
+  // Front - vibe chip eyebrow + the question.
   const q = el('div', 'layer q');
   const eyebrow = el('div', 'q-eyebrow');
   eyebrow.appendChild(el('span', 'vibe-chip', row.vibe));
@@ -29,7 +29,7 @@ export function buildCard(row, { active = false } = {}) {
   const long = (row.q || '').length > 95;
   q.appendChild(el('p', 'q-text' + (long ? ' sm' : ''), row.q));
 
-  // Back — the answer + attribution (source pill on the card's vibe accent).
+  // Back - the answer + attribution (source pill on the card's vibe accent).
   const a = el('div', 'layer a');
   a.appendChild(el('span', 'a-label', 'They said'));
   a.appendChild(el('p', 'a-text', row.a));

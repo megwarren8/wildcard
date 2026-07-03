@@ -1,15 +1,15 @@
 /* ==================================================================
-   WILDCARD — Ice-Breaker Slot Machine
+   WILDCARD - Ice-Breaker Slot Machine
    Ported from the design handoff prototype. Default theme = Carnival,
    default housing = Console. Tokens, type scale, and motion timings
    match the handoff spec exactly.
    ================================================================== */
 
 :root{
-  --bg0:#1a1140; --bg1:#0f0a24; --ink:#fef6e8; --dim:#a99fce;
-  --card:#fdf3df; --cardInk:#1a1140;
-  --a1:#ff5e3a; --a2:#ffd23f; --a3:#2fd6b0; --a4:#ff5e9c; --glow:#5b2bd6;
-  --font:'Bricolage Grotesque',sans-serif;
+  --bg0:#2E1F4A; --bg1:#1F1535; --ink:#FBF7FC; --dim:#B9A7D6;
+  --card:#FBF7FC; --cardInk:#1F1535;
+  --a1:#2BB7B3; --a2:#F2C94C; --a3:#6BA8E8; --a4:#E08BC4; --glow:#6E5AA8;
+  --font:'Schibsted Grotesk',system-ui,sans-serif;
   --cardH:clamp(228px, 42vh, 320px);
   --peek:clamp(46px, 8vh, 92px);
 }
@@ -179,7 +179,7 @@ body{
 .home-btn.hidden{opacity:0;pointer-events:none;transform:translateY(-8px) scale(.96);filter:blur(2px)}
 
 /* ==================================================================
-   Settings — real app settings (replaces the prototype Tweaks panel).
+   Settings - real app settings (replaces the prototype Tweaks panel).
    A subtle gear in the top-right opens a compact popover.
    ================================================================== */
 .settings{position:fixed;top:18px;right:18px;z-index:20}

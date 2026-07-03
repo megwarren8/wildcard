@@ -1,5 +1,5 @@
 /* ------------------------------------------------------------------
- *  Settings — the real, user-facing settings recommended by the
+ *  Settings - the real, user-facing settings recommended by the
  *  handoff. Vibe is chosen via the always-visible vibe bar (app.js);
  *  this popover exposes Source, Answer mode, Spin time, and Confetti.
  *  Cosmetic options (theme/font/housing/idle mark) are fixed to their
@@ -15,7 +15,7 @@ export const DEFAULTS = {
   vibe: 'Everything',        // 'Everything' | one of VIBES (set via the vibe bar)
   source: 'Everything',      // 'Everything' | one of SOURCES
   revealMode: 'Guess first', // 'Guess first' | 'Show answer'
-  spinSpeed: 2.6,            // seconds, 1.2–4
+  spinSpeed: 2.6,            // seconds, 1.2-4
   confetti: true,
 };
 
@@ -158,7 +158,7 @@ export function initSettings({ settings, onChange, sources = SOURCES }) {
   });
 }
 
-// segmented buttons may carry non-string values (booleans) — round-trip safely.
+// segmented buttons may carry non-string values (booleans) - round-trip safely.
 function encodeVal(v) { return typeof v === 'boolean' ? `b:${v}` : `s:${v}`; }
 function parseVal(s) {
   if (s.startsWith('b:')) return s === 'b:true';

@@ -1,4 +1,6 @@
-# WILDCARD — Ice-Breaker Slot Machine
+# WILDCARD: Ice-Breaker Slot Machine
+
+Designed and built by [Megan Warren](https://github.com/megwarren8).
 
 A single-screen party game. Press **SPIN**, a slot-machine reel lands on a random
 celebrity-interview question, you guess the answer out loud, then reveal what the
@@ -15,13 +17,13 @@ ES modules and `fetch()` need a real server (not `file://`), so:
 ./run.sh 5173       # or pick a port
 ```
 
-Then open the printed URL. No build step, no install — just Python 3 (already on macOS).
+Then open the printed URL. No build step, no install: just Python 3 (already on macOS).
 
 ## How to play
 
-- **SPIN** (or `Space` / `Enter`) — draw a random question.
-- **Reveal the answer** (or `R`) — flip the card to see what the guest said.
-- **← Back to question** (or `R`) — flip back, then spin again.
+- **SPIN** (or `Space` / `Enter`): draw a random question.
+- **Reveal the answer** (or `R`): flip the card to see what the guest said.
+- **← Back to question** (or `R`): flip back, then spin again.
 
 ## Settings
 
@@ -31,7 +33,7 @@ The gear in the top-right opens four settings (persisted in your browser):
 |---|---|---|
 | **Question pool** | Everything · On Purpose · Hot Ones | Everything |
 | **Answer** | Guess first · Show answer | Guess first |
-| **Spin time** | 1.2 – 4.0 s | 2.6 s |
+| **Spin time** | 1.2 to 4.0 s | 2.6 s |
 | **Confetti** | On · Off | On |
 
 Cosmetic options from the design prototype (theme, font, frame housing, idle mark)

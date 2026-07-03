@@ -1,5 +1,5 @@
 /* ==================================================================
- *  WILDCARD — main controller.
+ *  WILDCARD - main controller.
  *
  *  State machine:  idle → spinning → landed → revealed  (and back to
  *  landed, or a new spinning). All state is local; the active strip

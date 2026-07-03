@@ -36,7 +36,7 @@ export function buildStrip(pool) {
  * Returns a cleanup function that cancels the pending timers.
  *
  * @param {HTMLElement} el       the .reel-strip element
- * @param {number} spinSpeed     seconds (default 2.6, range 1.2–4)
+ * @param {number} spinSpeed     seconds (default 2.6, range 1.2-4)
  * @param {() => void} onLanded  called when the reel locks in
  */
 export function runSpin(el, spinSpeed, onLanded) {
