@@ -6,7 +6,7 @@ A single-screen party game. Press **SPIN**, a slot-machine reel lands on a rando
 celebrity-interview question, you guess the answer out loud, then reveal what the
 guest actually said. Built to live full-screen on a laptop or TV at a gathering.
 
-Questions are drawn from *On Purpose* (Final Five) and *Hot Ones* interview segments.
+Questions are drawn from *Hot Ones*, *Good Hang*, *SmartLess*, *New Heights*, *On Purpose*, and *Call Her Daddy* interview segments, all reworded so anyone playing can answer, guess, or riff on them without knowing who was originally asked.
 
 ## Run it
 
@@ -55,7 +55,7 @@ wildcard/
 │   ├── confetti.js        # landing confetti burst
 │   └── settings.js        # the four real settings + popover UI
 ├── data/
-│   └── questions.json     # 297 questions (124 On Purpose, 173 Hot Ones)
+│   └── questions.json     # 190 universal ice-breaker questions (Hot Ones, Good Hang, SmartLess, and more)
 └── run.sh                 # python3 -m http.server
 ```
 
