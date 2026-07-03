@@ -20,7 +20,7 @@
 :root{
   --bg0:#2E1F4A; --bg1:#1F1535; --ink:#FBF7FC; --dim:#B9A7D6;
   --card:#FBF7FC; --cardInk:#1F1535;
-  --a1:#2BB7B3; --a2:#C77FC9; --a3:#6E5AA8; --a4:#E2B3D6; --glow:#6E5AA8;
+  --a1:#F0904A; --a2:#F5CC48; --a3:#6E5AA8; --a4:#E2B3D6; --glow:#6E5AA8;
   --font:'Schibsted Grotesk',system-ui,sans-serif;
   --cardH:clamp(228px, 42vh, 320px);
   --peek:clamp(46px, 8vh, 92px);

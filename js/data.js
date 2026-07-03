@@ -16,7 +16,7 @@ export const VIBES = [
 
 /** Per-vibe accent colour - drives each card's --accent (theme-independent). */
 export const VIBE_ACCENT = {
-  'Favorites': '#E08BC4',
+  'Favorites': '#D5457A',
   'Food': '#F2A65A',
   'Hot takes': '#EE6C6C',
   'Would you rather': '#9B8BE0',
@@ -24,7 +24,7 @@ export const VIBE_ACCENT = {
   'Quantities': '#3FB8C9',
   'Childhood & school': '#2BB7B3',
   'Advice & life': '#5FC59A',
-  'Just silly': '#E89AD6',
+  'Just silly': '#B981E8',
   'Miscellaneous': '#F2C94C',
 };
 
