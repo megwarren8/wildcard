@@ -34,7 +34,14 @@ body{
   overflow:hidden;
   -webkit-font-smoothing:antialiased;
 }
-.app{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center}
+.app{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;
+  overflow-y:auto;-webkit-overflow-scrolling:touch}
+  /* .app is pinned to the exact viewport size, and its content height varies
+     (the controls row grows from one button to two once a card is revealed).
+     On a short screen that pushed "Spin again" past the bottom edge, on top
+     of the fixed .copyright corner, with nothing to scroll to reach it.
+     overflow-y:auto is the fallback: on a tall screen there is nothing to
+     scroll and this is a no-op; on a short one, it is now reachable. */
 
 /* backdrop ------------------------------------------------------- */
 .backdrop{position:absolute;inset:0;z-index:0;
@@ -55,7 +62,10 @@ body{
 
 /* stage ---------------------------------------------------------- */
 .stage{position:relative;z-index:2;flex:1;width:100%;max-width:920px;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;padding:8px 20px 18px;min-height:0}
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;padding:8px 20px 50px;min-height:0}
+  /* bottom padding clears the fixed .copyright corner (14px from bottom + its
+     own height); on a short viewport the centered stage content otherwise
+     runs flush to the bottom and the Spin button sits on top of the credit. */
 
 .reel-frame{position:relative;width:100%;border-radius:30px;padding:14px;
   background:linear-gradient(180deg, color-mix(in oklab,var(--ink) 9%,transparent), color-mix(in oklab,var(--bg1) 40%,transparent));
