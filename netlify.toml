@@ -1,0 +1,8 @@
+# Wildcard now lives at wildcard.megan-warren.com (Cloudflare Pages). This
+# repo's old Netlify site (wildcard-warren.netlify.app) forwards here so any
+# old bookmark or shared link still lands in the right place.
+[[redirects]]
+  from = "/*"
+  to = "https://wildcard.megan-warren.com/:splat"
+  status = 301
+  force = true
